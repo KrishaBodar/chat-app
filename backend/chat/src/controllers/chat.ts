@@ -3,7 +3,7 @@ import TryCatch from "../config/TryCatch.js";
 import { AuthenticatedRequest } from "../middlewares/isAuth.js";
 import { Chat } from "../models/Chat.js";
 import { Message } from "../models/Messages.js";
-
+import { io } from "../index.js";
 export const createNewChat = TryCatch(
     async (req: AuthenticatedRequest, res) => {
         const userId = req.user?._id;
@@ -187,6 +187,8 @@ export const sendMessage = TryCatch(async (req: AuthenticatedRequest, res)=>{
   const message = new Message(messageData);
 
   const savedMessage = await message.save();
+
+  io.to(chatId).emit("receive_message", savedMessage);
 
   const latestMessageText = imageFile? "📷 image": text;
 
